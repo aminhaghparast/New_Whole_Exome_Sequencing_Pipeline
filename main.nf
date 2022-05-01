@@ -9,7 +9,7 @@ nextflow.enable.dsl = 2
 /*
  * Define the default parameters
  */ 
-
+params.outputname = "output"
 params.outdir = "./Results"
 params.interval = "$baseDir/data/bed_files/S31285117_Padded.bed"
 params.humandb = "/opt/annovar/humandb"
@@ -59,6 +59,8 @@ include {
 include { 
     FASTP;
     FASTQC; 
+    BOWTIE_INDEX;
+    BOWTIE;
     BWA;
     SAM_TO_BAM;
     SORTING_BAM_FILE;
@@ -114,7 +116,13 @@ workflow {
   BWA (
         REFERENCE_GENOME.out[0],
         BWA_INDEX.out,
-        read_pairs_ch)
+        FASTP.out)
+
+  BOWTIE_INDEX ()
+ 
+  BOWTIE (
+       BOWTIE_INDEX.out,
+       FASTP.out)
 
   SAM_TO_BAM (BWA.out)
 
@@ -197,11 +205,17 @@ workflow {
   HARD_FILTERING_STEP_5 (
         HARD_FILTERING_STEP_3.out,
         HARD_FILTERING_STEP_4.out,
-        VARIANT_CALLING.out )
+        VARIANT_CALLING.out ) 
+
+ 
+
+
+}
+
+/*
   ANNOTATION (
         HARD_FILTERING_STEP_5.out,
         VARIANT_CALLING.out )
         
   VCF2TSV (ANNOTATION.out[0])
-
-}
+  */

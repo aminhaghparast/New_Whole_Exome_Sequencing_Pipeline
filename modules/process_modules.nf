@@ -3,14 +3,14 @@
 process FASTP {
     label 'process'
     publishDir params.outdir, mode: 'copy', pattern: 'fastp_trimmed/*' // publish only trimmed fastq files
-    publishDir params.outdir, mode: 'copy', pattern: "${sample_id}_fastp.json" 
-    publishDir params.outdir, mode: 'copy', pattern: "${sample_id}_fastp.html"
+    publishDir params.outdir, mode: 'copy', pattern: "${params.outputname}_fastp.json" 
+    publishDir params.outdir, mode: 'copy', pattern: "${params.outputname}_fastp.html"
 
     input:
         tuple val(sample_id), path(x)
     
     output:
-        tuple val("${sample_id}") , path("fastp_trimmed/trimmed_${sample_id}{1,2}.fastq.gz")
+        tuple val("${sample_id}") , path("fastp_trimmed/trimmed_${params.outputname}_{1,2}.fastq.gz")
         //file("${sample_id}_fastp.json")
 
     script:
@@ -21,9 +21,9 @@ process FASTP {
         fastp \
         -q $qscore_cutoff \
         -i ${x[0]} -I ${x[1]} \
-        -o fastp_trimmed/trimmed_${x[0]} -O fastp_trimmed/trimmed_${x[1]} \
-        -j ${sample_id}_fastp.json \
-        -h ${sample_id}_fastp.html
+        -o fastp_trimmed/trimmed_${params.outputname}_1.fastq.gz -O fastp_trimmed/trimmed_${params.outputname}_2.fastq.gz \
+        -j ${params.outputname}_fastp.json \
+        -h ${params.outputname}_fastp.html
         """
 }
 
@@ -59,19 +59,69 @@ process BWA {
     tuple val ( sample_id ) , path ( x )
 
 	output:
-	file "${sample_id}.sam"
+	file "${params.outputname}.sam"
 
     script:
 	"""
 	bwa mem \
     -M \
     -R '@RG\\tID:${params.rg}\\tSM:${params.samplename}\\tPL:Illumina' \
-    $reference ${x[0]} ${x[1]}  > ${sample_id}.sam
+    $reference ${x[0]} ${x[1]}  > ${params.outputname}.sam
 
 	"""
-		
 }
 
+
+process BOWTIE_INDEX {
+	publishDir "${params.outdir}/reference"
+	label 'bowtie'
+
+	output:
+	file "index_file.1.bt2" 
+	file "index_file.2.bt2"
+	file "index_file.3.bt2" 
+	file "index_file.4.bt2"
+	file "index_file.rev.1.bt2" 
+	file "index_file.rev.2.bt2"
+
+    script:
+	"""
+	gunzip -dc /data/index_file.1.bt2.gz > index_file.1.bt2
+	gunzip -dc /data/index_file.2.bt2.gz > index_file.2.bt2
+	gunzip -dc /data/index_file.3.bt2.gz > index_file.3.bt2
+	gunzip -dc /data/index_file.4.bt2.gz > index_file.4.bt2
+	gunzip -dc /data/index_file.rev.1.bt2.gz > index_file.rev.1.bt2
+	gunzip -dc /data/index_file.rev.2.bt2.gz > index_file.rev.2.bt2
+
+	"""
+}
+
+process BOWTIE {
+	publishDir "${params.outdir}/MappedRead"
+	label 'bowtie'
+
+	input:
+	file ( index_1 )
+	file ( index_2 )
+    file ( index_3 )
+	file ( index_4 )
+    file ( index_5 )
+	file ( index_6 )
+    tuple val ( sample_id ) , path ( x )
+
+	output:
+	file "KM01_bowtie.sam"
+
+    script:
+	"""
+    bowtie2 \
+    -p 2 \
+    -x index_file  \
+    -1 ${x[0]} -2 ${x[1]} \
+    -S KM01_bowtie.sam
+
+	"""
+}
 
 process SAM_TO_BAM {
     publishDir params.outdir, mode: 'copy'
@@ -81,14 +131,14 @@ process SAM_TO_BAM {
         file ( sam_file )
 
     output:
-       path "${sam_file.baseName}.bam"
+       path "${params.outputname}.bam"
 
     script:
     """
     samtools view \
     -b \
     -@ 12 \
-    ${sam_file} > ${sam_file.baseName}.bam
+    ${sam_file} > ${params.outputname}.bam
     
     """    
 }
@@ -102,13 +152,13 @@ process SORTING_BAM_FILE {
         file ( bam_file )
 
     output:
-       path "${bam_file.baseName}_sorted.bam"
+       path "${params.outputname}_sorted.bam"
 
     script:
     """
     picard SortSam  \
     I=${bam_file}  \
-    O=${bam_file.baseName}_sorted.bam  \
+    O=${params.outputname}_sorted.bam  \
     SORT_ORDER=coordinate
     
     """   
@@ -123,13 +173,13 @@ process MARKDUPLICATE {
         file ( sorted_bam_file )   
 
     output:
-        path "${sorted_bam_file.baseName}_markduplicated.bam"
+        path "${params.outputname}_sorted_markduplicated.bam"
 
     script:
     """
     picard MarkDuplicates   \
     I=${sorted_bam_file}   \
-    O=${sorted_bam_file.baseName}_markduplicated.bam  \
+    O=${params.outputname}_sorted_markduplicated.bam  \
     M=metrics.txt   \
     REMOVE_DUPLICATES=true   \
     AS=true
@@ -146,13 +196,13 @@ process ADD_OR_REPLACE_READGROUPS {
         file ( sorted_and_markduplicated_bam_file )   
 
     output:
-        path "${sorted_and_markduplicated_bam_file.baseName}_readgroups.bam"
+        path "${params.outputname}_ReadGroupsAdded_sorted_markduplicated.bam"
 
     script:
     """
     picard AddOrReplaceReadGroups   \
     I=${sorted_and_markduplicated_bam_file}  \
-    O=${sorted_and_markduplicated_bam_file.baseName}_readgroups.bam   \
+    O=${params.outputname}_ReadGroupsAdded_sorted_markduplicated.bam  \
     LB=SureSelectV7  \
     PL=Illumina   \
     PU=novaseq6000  \
@@ -169,13 +219,13 @@ process BUILDING_BAM_INDEX {
         file ( sorted_markduplicated_and_readgroups_bam_file )   
 
     output:
-        path "${sorted_markduplicated_and_readgroups_bam_file.baseName}.bai"
+        path "${params.outputname}.bai"
 
     script:
     """
     picard BuildBamIndex   \
     I=${sorted_markduplicated_and_readgroups_bam_file}  \
-    O=${sorted_markduplicated_and_readgroups_bam_file.baseName}.bai
+    O=${params.outputname}.bai
 
     """   
 }
@@ -199,14 +249,14 @@ process BASE_RECALIBRATOR {
 
 
     output:
-        path "${sorted_markduplicated_and_readgroups_bam_file.baseName}_recal_BQSR.table"
+        path "${params.outputname}_recal_BQSR.table"
 
     script:
     """
     gatk BaseRecalibrator   -R ${fasta}   -I ${sorted_markduplicated_and_readgroups_bam_file}  \
     --known-sites ${dbsnp}  \
     --known-sites ${phase1_snp}  \
-    -O ${sorted_markduplicated_and_readgroups_bam_file.baseName}_recal_BQSR.table
+    -O ${params.outputname}_recal_BQSR.table
 
     """   
 }
@@ -225,13 +275,13 @@ process APPLY_BQSR {
 
 
     output:
-        path "${sorted_markduplicated_and_readgroups_bam_file.baseName}_recal.bam"
+        path "${params.outputname}_recal.bam"
 
     script:
     """
     gatk ApplyBQSR    -R ${fasta}   -I ${sorted_markduplicated_and_readgroups_bam_file} \
     -bqsr ${sorted_markduplicated_and_readgroups_recal_BQSR_table}  \
-    -O ${sorted_markduplicated_and_readgroups_bam_file.baseName}_recal.bam
+    -O ${params.outputname}_recal.bam
 
     """   
 }
@@ -253,12 +303,12 @@ process VARIANT_CALLING {
         file ( fasta_dict )  
 
     output:
-        path "${sorted_markduplicated_readgroups_recal_bam_file.baseName}.vcf"
+        path "${params.outputname}.vcf"
 
     script:
     """
     gatk HaplotypeCaller    -I ${sorted_markduplicated_readgroups_recal_bam_file}    \
-    -O ${sorted_markduplicated_readgroups_recal_bam_file.baseName}.vcf   -R ${fasta}
+    -O ${params.outputname}.vcf   -R ${fasta}
 
     """   
 }
@@ -398,7 +448,7 @@ process VQSR_APPLY_INDEL {
     
 
 	output:
-	file "${sample_id}_recalibrated_variants.vcf"
+	file "${params.outputname}_recalibrated_variants.vcf"
 	
 	script:
 	"""
@@ -408,7 +458,7 @@ process VQSR_APPLY_INDEL {
 	--tranches-file $variantrecalibrator_indel_tranches \
 	-mode INDEL \
 	-ts-filter-level 99.0 \
-	-O ${sample_id}_recalibrated_variants.vcf
+	-O ${params.outputname}_recalibrated_variants.vcf
 
 	"""
 }
@@ -424,14 +474,14 @@ process HARD_FILTERING_STEP_1 {
         file ( vcf_file )   
 
     output:
-        path "${vcf_file.baseName}_snp.vcf"
+        path "${params.outputname}_snp.vcf"
 
     script:
     """
     gatk SelectVariants  \
     -V ${vcf_file}   \
     -select-type SNP   \
-    -O ${vcf_file.baseName}_snp.vcf
+    -O ${params.outputname}_snp.vcf
 
     """   
 }
@@ -445,14 +495,14 @@ process HARD_FILTERING_STEP_2 {
         file ( vcf_file )   
 
     output:
-        path "${vcf_file.baseName}_indel.vcf"
+        path "${params.outputname}_indel.vcf"
 
     script:
     """
     gatk SelectVariants  \
     -V ${vcf_file}   \
     -select-type INDEL  \
-    -O  ${vcf_file.baseName}_indel.vcf
+    -O  ${params.outputname}_indel.vcf
 
     """   
 }
@@ -466,14 +516,14 @@ process HARD_FILTERING_STEP_3 {
         file ( vcf_snp_file )   
 
     output:
-        path "${vcf_snp_file.baseName}_filtered.vcf"
+        path "${params.outputname}_snp_filtered.vcf"
 
     script:
     """
     gatk VariantFiltration -V ${vcf_snp_file} \
     -filter "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0 || SOR > 3.0"  \
     --filter-name "SNP_FILTER" \
-    -O ${vcf_snp_file.baseName}_filtered.vcf
+    -O ${params.outputname}_snp_filtered.vcf
     
     """   
 }
@@ -487,14 +537,14 @@ process HARD_FILTERING_STEP_4 {
         file ( vcf_indel_file )   
 
     output:
-        path "${vcf_indel_file.baseName}_filtered.vcf"
+        path "${params.outputname}_indel_filtered.vcf"
     
     script:
     """
     gatk VariantFiltration -V ${vcf_indel_file} \
     -filter "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0" \
     --filter-name "INDEL_FILTER" \
-    -O ${vcf_indel_file.baseName}_filtered.vcf
+    -O ${params.outputname}_indel_filtered.vcf
 
     """   
 }
@@ -510,12 +560,12 @@ process HARD_FILTERING_STEP_5 {
         file ( vcf_file )  
 
     output:
-        path "${vcf_file.baseName}_merged.vcf"
+        path "${params.outputname}_merged.vcf"
 
     script:
     """
     gatk MergeVcfs -I ${vcf_snp_filtered_file} -I ${vcf_indel_filtered_file } \
-    -O ${vcf_file.baseName}_merged.vcf
+    -O ${params.outputname}_merged.vcf
 
     """   
 }
@@ -530,14 +580,14 @@ process ANNOTATION {
         file ( vcf_file )
   
     output:
-       path "${vcf_file.baseName}_final.hg19_multianno.vcf"
-       path "${vcf_file.baseName}_final.hg19_multianno.txt"
-       path "${vcf_file.baseName}_final.avinput"
+       path "${params.outputname}_final.hg19_multianno.vcf"
+       path "${params.outputname}_final.hg19_multianno.txt"
+       path "${params.outputname}_final.avinput"
 
     script:
     """
     /opt/annovar/table_annovar.pl ${merged_vcf_file} ${params.humandb} -buildver hg19 \
-    -out ${vcf_file.baseName}_final \
+    -out ${params.outputname}_final \
     --remove \
     --thread 2 \
     -protocol refGene  \
@@ -556,13 +606,13 @@ process VCF2TSV {
         file ( multianno_vcf_file )
   
     output:
-        path "${multianno_vcf_file.baseName}.tsv"
+        path "multianno_${params.outputname}.tsv"
 
     script:
     """
     vcf2tsv -g  \
     -n null_string   \
-    $multianno_vcf_file > ${multianno_vcf_file.baseName}.tsv
+    $multianno_vcf_file > multianno_${params.outputname}.tsv
    
     """   
 }

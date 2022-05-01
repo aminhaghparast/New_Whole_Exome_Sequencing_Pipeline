@@ -1,0 +1,9 @@
+name: bowtie
+channels:
+  - defaults
+  - bioconda
+  - conda-forge
+dependencies:
+  # Default bismark
+  - bowtie2=2.4.5
+  - gzip=1.11
