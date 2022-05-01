@@ -1,6 +1,9 @@
 # Whole-Exome-Sequencing
 
+A Nextflow pipeline for Variant Calling Analysis with NGS RNA-Seq data based on GATK best practices.
 
+[![nextflow](https://img.shields.io/badge/nextflow-%E2%89%A520.01.0-brightgreen.svg)](http://nextflow.io)
+[![Build Status](https://github.com/CRG-CNAG/CalliNGS-NF/actions/workflows/ci.yml/badge.svg)](https://github.com/CRG-CNAG/CalliNGS-NF/actions/workflows/ci.yml)
 
 
 
@@ -35,60 +38,10 @@ WES_pipeline uses the following software components and tools:
 * vcflib    1.0.3
 * picard    2.26.11
 * GATK      4.2.6.1
+* bowtie2   2.4.5
 * Annovar
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# CalliNGS-NF
-A Nextflow pipeline for Variant Calling Analysis with NGS RNA-Seq data based on GATK best practices.
-
-[![nextflow](https://img.shields.io/badge/nextflow-%E2%89%A520.01.0-brightgreen.svg)](http://nextflow.io)
-[![Build Status](https://github.com/CRG-CNAG/CalliNGS-NF/actions/workflows/ci.yml/badge.svg)](https://github.com/CRG-CNAG/CalliNGS-NF/actions/workflows/ci.yml)
-
-## Quickstart 
-
-Install Nextflow by using the following command: 
-
-    curl -s https://get.nextflow.io | bash 
-    
-Download the Docker image with this command (optional) : 
-
-    docker pull cbcrg/callings-nf:gatk4
-
-
-Launch the pipeline execution with the following command: 
-
-    nextflow run CRG-CNAG/CalliNGS-NF -profile docker
-
-Note: the Docker image contains all the required dependencies. Add the `-profile docker` 
-  to enable the containerised execution to the example command line shown below. 
 
 ## Pipeline Description
 
@@ -204,16 +157,3 @@ required software components reported in the following section. See the included
 [Dockerfile](docker/Dockerfile) for the configuration details.
  
 
-## Components 
-
-CalliNGS-NF uses the following software components and tools: 
-
-* Java 8 
-* Samtools 1.3.1
-* Vcftools 0.1.14
-* STAR 2.5.2b
-* GATK 4.1
-* R 3.1.1 
-* Awk
-* Perl
-* Grep
