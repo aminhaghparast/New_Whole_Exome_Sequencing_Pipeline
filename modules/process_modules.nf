@@ -47,6 +47,7 @@ process TRIMMOMATIC {
         trimmomatic PE ${x[0]}  ${x[0]}   \
         output_forward_paired.fq.gz output_forward_unpaired.fq.gz  \
         output_reverse_paired.fq.gz output_reverse_unpaired.fq.gz   \
+        ILLUMINACLIP:${params.adapter}:2:30:10:2:True   \
         SLIDINGWINDOW:4:20   \
         LEADING:3   \
         TRAILING:3   \

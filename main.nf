@@ -11,6 +11,7 @@ nextflow.enable.dsl = 2
  */ 
 params.outputname ="output"
 params.outdir = "./Results"
+params.adapter = "$baseDir/data/adapter.fa"
 params.interval = "$baseDir/data/bed_files/S31285117_Padded.bed"
 params.humandb = "/opt/annovar/humandb"
 params.reads = "$baseDir/reads/*{1,2}*.fastq.gz"
