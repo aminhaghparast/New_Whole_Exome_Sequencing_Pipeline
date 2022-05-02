@@ -50,41 +50,41 @@ if (params.help) {
  */
 
 include { 
-    REFERENCE_GENOME;
-    dbSNP;
-    golden_indel; 
-    hapmap;
-    omni;
-    phase1_SNPs;
-    BWA_INDEX } from './modules/GATK_resource_modules.nf'
+   REFERENCE_GENOME;
+   dbSNP;
+   golden_indel; 
+   hapmap;
+   omni;
+   phase1_SNPs;
+   BWA_INDEX } from './modules/GATK_resource_modules.nf'
 
 
 include { 
-    FASTP;
-    TRIMMOMATIC;
-    FASTQC; 
-    BOWTIE_INDEX;
-    BOWTIE;
-    BWA;
-    SAM_TO_BAM;
-    SORTING_BAM_FILE;
-    MARKDUPLICATE;
-    ADD_OR_REPLACE_READGROUPS;
-    BUILDING_BAM_INDEX;
-    BASE_RECALIBRATOR;
-    APPLY_BQSR;
-    VARIANT_CALLING;
-    VARIANTRECALIBRATOR_SNPS;
-    VQSR_APPLY_SNP;
-    VARIANTRECALIBRATOR_INDELS;
-    VQSR_APPLY_INDEL;
-    HARD_FILTERING_STEP_1;
-    HARD_FILTERING_STEP_2;
-    HARD_FILTERING_STEP_3;
-    HARD_FILTERING_STEP_4;
-    HARD_FILTERING_STEP_5;
-    ANNOTATION;
-    VCF2TSV } from './modules/process_modules.nf'
+   FASTP;
+   TRIMMOMATIC;
+   FASTQC; 
+   BOWTIE_INDEX;
+   BOWTIE;
+   BWA;
+   SAM_TO_BAM;
+   SORTING_BAM_FILE;
+   MARKDUPLICATE;
+   ADD_OR_REPLACE_READGROUPS;
+   BUILDING_BAM_INDEX;
+   BASE_RECALIBRATOR;
+   APPLY_BQSR;
+   VARIANT_CALLING;
+   VARIANTRECALIBRATOR_SNPS;
+   VQSR_APPLY_SNP;
+   VARIANTRECALIBRATOR_INDELS;
+   VQSR_APPLY_INDEL;
+   HARD_FILTERING_STEP_1;
+   HARD_FILTERING_STEP_2;
+   HARD_FILTERING_STEP_3;
+   HARD_FILTERING_STEP_4;
+   HARD_FILTERING_STEP_5;
+   ANNOTATION;
+   VCF2TSV } from './modules/process_modules.nf'
 
 /* 
  * main pipeline logic
