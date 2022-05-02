@@ -60,6 +60,7 @@ include {
 
 include { 
     FASTP;
+    TRIMMOMATIC;
     FASTQC; 
     BOWTIE_INDEX;
     BOWTIE;
@@ -112,6 +113,8 @@ workflow {
   BWA_INDEX()
 
   FASTP (read_pairs_ch) 
+
+  TRIMMOMATIC (read_pairs_ch)
 
   FASTQC (read_pairs_ch)
 

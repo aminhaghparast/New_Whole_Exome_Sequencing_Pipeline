@@ -27,6 +27,34 @@ process FASTP {
         """
 }
 
+
+process TRIMMOMATIC {
+    label 'trimmomatic'
+    publishDir params.outdir 
+
+
+    input:
+        tuple val(sample_id), path(x)
+    
+    output:
+        path "output_forward_paired.fq.gz"
+        path "output_forward_unpaired.fq.gz"
+        path "output_reverse_paired.fq.gz"
+        path "output_reverse_unpaired.fq.gz"
+
+    script:
+        """
+        trimmomatic PE ${x[0]}  ${x[0]}   \
+        output_forward_paired.fq.gz output_forward_unpaired.fq.gz  \
+        output_reverse_paired.fq.gz output_reverse_unpaired.fq.gz   \
+        SLIDINGWINDOW:4:20   \
+        LEADING:3   \
+        TRAILING:3   \
+        MINLEN:36
+        """
+}
+
+
 process FASTQC {
     label 'process'
     publishDir params.outdir 
