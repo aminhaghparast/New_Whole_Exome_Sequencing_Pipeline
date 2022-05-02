@@ -37,21 +37,19 @@ process TRIMMOMATIC {
         tuple val(sample_id), path(x)
     
     output:
-        path "output_forward_paired.fq.gz"
-        path "output_forward_unpaired.fq.gz"
-        path "output_reverse_paired.fq.gz"
-        path "output_reverse_unpaired.fq.gz"
+        tuple val("${sample_id}") , path("trimmed_paired_{1,2}.fq.gz")
 
     script:
         """
-        trimmomatic PE ${x[0]}  ${x[0]}   \
-        output_forward_paired.fq.gz output_forward_unpaired.fq.gz  \
-        output_reverse_paired.fq.gz output_reverse_unpaired.fq.gz   \
+        trimmomatic PE ${x[0]}  ${x[1]}   \
+        trimmed_paired_1.fq.gz trimmed_unpaired_1.fq.gz  \
+        trimmed_paired_2.fq.gz trimmed_unpaired_2.fq.gz   \
         ILLUMINACLIP:${params.adapter}:2:30:10:2:True   \
         SLIDINGWINDOW:4:20   \
         LEADING:3   \
         TRAILING:3   \
         MINLEN:36
+        
         """
 }
 

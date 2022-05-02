@@ -71,26 +71,25 @@ example: `ENCSR000COQ1_2.fastq.gz`.
 
 #### `--reads` 
    
-* Specifies the location of the reads FASTQ file(s).
-* Multiple files can be specified using the usual wildcards (*, ?), in this case make sure to surround the parameter string
-  value by single quote characters (see the example below)
-* By default it is set to the CalliNGS-NF's location: `$baseDir/data/reads/rep1_{1,2}.fq.gz`
-* See above for naming convention of samples, replicates and pairs read files.
+* Specifies the location of the paired end reads FASTQ file(s). these reads must be in a standard format as "*{1,2}*.fastq.gz"
+* By default it is set to a test data located in : `$baseDir/reads/read_{1,2}.fq.gz`
+
 
 Example: 
 
     $ nextflow run CRG-CNAG/CalliNGS-NF --reads '/home/dataset/*_{1,2}.fq.gz'
 
 
-#### `--genome`
+#### `--trimming`
 
-* The location of the genome fasta file.
-* It should end in `.fa`.
-* By default it is set to the CalliNGS-NF's location: `$baseDir/data/genome.fa`.
+* The desire method for trimming reads. the available choices are "fastp" and "trimmomatic" .
 
-Example:
 
-    $ nextflow run CRG-CNAG/CalliNGS-NF --genome /home/user/my_genome/human.fa
+#### `--alignment`
+
+* The desire method for alignment. the available choices are "bowtie" and "BWA-MEM" .
+
+
     
 
 #### `--variants`
@@ -104,11 +103,10 @@ Example:
     $ nextflow run CRG-CNAG/CalliNGS-NF --variants /home/user/data/variants.vcf
 
 
-#### `--denylist` (formely `--blacklist`)
+#### `--bedfile` 
 
-* The location of the denylisted genome regions in bed format.
-* It should end in `.bed`.
-* By default it is set to the CalliNGS-NF's location: `$baseDir/data/denylist.bed`.
+* Target enrichment design files showing the exoms area in the used capturing kit. it must be in '.bed' format.
+* By default it is set to this location: '$baseDir/data/bed_files/S31285117_Padded.bed'.
 
 Example:
 

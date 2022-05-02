@@ -86,8 +86,6 @@ include {
     ANNOTATION;
     VCF2TSV } from './modules/process_modules.nf'
 
-
-
 /* 
  * main pipeline logic
  */
@@ -111,30 +109,50 @@ workflow {
   
   phase1_SNPs()
   
-  BWA_INDEX()
-
-  FASTP (read_pairs_ch) 
-
-  TRIMMOMATIC (read_pairs_ch)
-
   FASTQC (read_pairs_ch)
 
-  if (!params.alignment) {exit 1, "Please specify your desirable alignment method by using --alignment argument in the command"}
-  if (params.alignment== 'BWA') {
-    BWA (
-        REFERENCE_GENOME.out[0],
-        BWA_INDEX.out,
-        FASTP.out)
-    SAM_TO_BAM (BWA.out)
-   }
-  if (params.alignment== 'bowtie') {
-    BOWTIE_INDEX ()
- 
-    BOWTIE (
-       BOWTIE_INDEX.out,
-       FASTP.out)
-    SAM_TO_BAM (BOWTIE.out)
-   }
+
+  if (!params.trimming) {exit 1, "Please specify your desirable trimming method by using --trimming argument in the command"}
+  if (params.trimming== 'fastp') {
+          if (!params.alignment) {exit 1, "Please specify your desirable alignment method by using --alignment argument in the command"}
+          if (params.alignment== 'BWA_MEM') {
+                        FASTP (read_pairs_ch) 
+                        BWA_INDEX()
+                        BWA (
+                        REFERENCE_GENOME.out[0],
+                        BWA_INDEX.out,
+                        FASTP.out)
+                        SAM_TO_BAM (BWA.out)
+          }
+          if (params.alignment== 'bowtie') {
+                        FASTP (read_pairs_ch) 
+                        BOWTIE_INDEX ()
+                        BOWTIE (
+                        BOWTIE_INDEX.out,
+                        FASTP.out)
+                        SAM_TO_BAM (BOWTIE.out)
+          }
+  }
+  if (params.trimming== 'trimmomatic') {
+          if (!params.alignment) {exit 1, "Please specify your desirable alignment method by using --alignment argument in the command"}
+          if (params.alignment== 'BWA') {
+                        TRIMMOMATIC (read_pairs_ch)
+                        BWA_INDEX()
+                        BWA (
+                        REFERENCE_GENOME.out[0],
+                        BWA_INDEX.out,
+                        TRIMMOMATIC.out)
+                        SAM_TO_BAM (BWA.out)
+          }
+          if (params.alignment== 'bowtie') {
+                        TRIMMOMATIC (read_pairs_ch)
+                        BOWTIE_INDEX ()
+                        BOWTIE (
+                        BOWTIE_INDEX.out,
+                        TRIMMOMATIC.out)
+                        SAM_TO_BAM (BOWTIE.out)
+          }
+  }
 
   SORTING_BAM_FILE (SAM_TO_BAM.out)
 
