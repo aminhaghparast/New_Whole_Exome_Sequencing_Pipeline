@@ -93,27 +93,27 @@ include {
 workflow {
 
   Channel 
-    .fromFilePairs( params.reads, checkIfExists: true, size: -1 ) // default is 2, so set to -1 to allow any number of files
-    .ifEmpty { error "Can not find any reads matching ${reads}" }
-    .set{ read_pairs_ch }
+      .fromFilePairs( params.reads, checkIfExists: true, size: -1 ) // default is 2, so set to -1 to allow any number of files
+      .ifEmpty { error "Can not find any reads matching ${reads}" }
+      .set{ read_pairs_ch }
 
-  REFERENCE_GENOME()
+   REFERENCE_GENOME()
   
-  dbSNP()
+   dbSNP()
   
-  golden_indel() 
+   golden_indel() 
   
-  hapmap()
+   hapmap()
   
-  omni()
+   omni()
   
-  phase1_SNPs()
+   phase1_SNPs()
   
-  FASTQC (read_pairs_ch)
+   FASTQC (read_pairs_ch)
 
 
-  if (!params.trimming) {exit 1, "Please specify your desirable trimming method by using --trimming argument in the command"}
-  if (params.trimming== 'fastp') {
+   if (!params.trimming) {exit 1, "Please specify your desirable trimming method by using --trimming argument in the command"}
+   if (params.trimming== 'fastp') {
           if (!params.alignment) {exit 1, "Please specify your desirable alignment method by using --alignment argument in the command"}
           if (params.alignment== 'BWA_MEM') {
                         FASTP (read_pairs_ch) 
@@ -132,8 +132,8 @@ workflow {
                         FASTP.out)
                         SAM_TO_BAM (BOWTIE.out)
           }
-  }
-  if (params.trimming== 'trimmomatic') {
+   }
+   if (params.trimming== 'trimmomatic') {
           if (!params.alignment) {exit 1, "Please specify your desirable alignment method by using --alignment argument in the command"}
           if (params.alignment== 'BWA') {
                         TRIMMOMATIC (read_pairs_ch)
@@ -152,17 +152,17 @@ workflow {
                         TRIMMOMATIC.out)
                         SAM_TO_BAM (BOWTIE.out)
           }
-  }
+   }
 
-  SORTING_BAM_FILE (SAM_TO_BAM.out)
+   SORTING_BAM_FILE (SAM_TO_BAM.out)
 
-  MARKDUPLICATE (SORTING_BAM_FILE.out)
+   MARKDUPLICATE (SORTING_BAM_FILE.out)
 
-  ADD_OR_REPLACE_READGROUPS (MARKDUPLICATE.out)
+   ADD_OR_REPLACE_READGROUPS (MARKDUPLICATE.out)
 
-  BUILDING_BAM_INDEX (ADD_OR_REPLACE_READGROUPS.out)
+   BUILDING_BAM_INDEX (ADD_OR_REPLACE_READGROUPS.out)
 
-  BASE_RECALIBRATOR (
+   BASE_RECALIBRATOR (
         REFERENCE_GENOME.out[0],
         ADD_OR_REPLACE_READGROUPS.out,
         dbSNP.out[0],
@@ -172,20 +172,20 @@ workflow {
         REFERENCE_GENOME.out[1],
         REFERENCE_GENOME.out[2])
 
-  APPLY_BQSR (
+   APPLY_BQSR (
         REFERENCE_GENOME.out[0],
         ADD_OR_REPLACE_READGROUPS.out,
         BASE_RECALIBRATOR.out,
         REFERENCE_GENOME.out[1],
         REFERENCE_GENOME.out[2])
 
-  VARIANT_CALLING (
+   VARIANT_CALLING (
         APPLY_BQSR.out,
         REFERENCE_GENOME.out[0],
         REFERENCE_GENOME.out[1],
         REFERENCE_GENOME.out[2])
 
-  VARIANTRECALIBRATOR_SNPS (
+   VARIANTRECALIBRATOR_SNPS (
         VARIANT_CALLING.out,
         REFERENCE_GENOME.out[0],
         hapmap.out[0],
@@ -199,13 +199,13 @@ workflow {
         phase1_SNPs.out[1],
         dbSNP.out[1] )
 
-  VQSR_APPLY_SNP (
+   VQSR_APPLY_SNP (
         VARIANT_CALLING.out,
         VARIANTRECALIBRATOR_SNPS.out[0],
         VARIANTRECALIBRATOR_SNPS.out[1],
         VARIANTRECALIBRATOR_SNPS.out[2] )
 
-  VARIANTRECALIBRATOR_INDELS (
+   VARIANTRECALIBRATOR_INDELS (
         VQSR_APPLY_SNP.out,
         REFERENCE_GENOME.out[0],
         golden_indel.out[0],
@@ -215,22 +215,22 @@ workflow {
         golden_indel.out[1],
         dbSNP.out[1] )
         
-  VQSR_APPLY_INDEL (
+   VQSR_APPLY_INDEL (
         VQSR_APPLY_SNP.out,
         VARIANTRECALIBRATOR_INDELS.out[0],
         VARIANTRECALIBRATOR_INDELS.out[1],
         VARIANTRECALIBRATOR_INDELS.out[2],
         read_pairs_ch )
 
-  HARD_FILTERING_STEP_1 (VARIANT_CALLING.out)
+   HARD_FILTERING_STEP_1 (VARIANT_CALLING.out)
 
-  HARD_FILTERING_STEP_2 (VARIANT_CALLING.out)
+   HARD_FILTERING_STEP_2 (VARIANT_CALLING.out)
 
-  HARD_FILTERING_STEP_3 (HARD_FILTERING_STEP_1.out)
+   HARD_FILTERING_STEP_3 (HARD_FILTERING_STEP_1.out)
 
-  HARD_FILTERING_STEP_4 (HARD_FILTERING_STEP_2.out)
+   HARD_FILTERING_STEP_4 (HARD_FILTERING_STEP_2.out)
 
-  HARD_FILTERING_STEP_5 (
+   HARD_FILTERING_STEP_5 (
         HARD_FILTERING_STEP_3.out,
         HARD_FILTERING_STEP_4.out,
         VARIANT_CALLING.out ) 
