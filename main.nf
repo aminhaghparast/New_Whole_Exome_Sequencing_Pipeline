@@ -6,14 +6,16 @@
 nextflow.enable.dsl = 2
 
 
-/*
+/* 
  * Define the default parameters
  */ 
-params.outputname = "output"
+params.outputname ="output"
 params.outdir = "./Results"
 params.interval = "$baseDir/data/bed_files/S31285117_Padded.bed"
 params.humandb = "/opt/annovar/humandb"
 params.reads = "$baseDir/reads/*{1,2}*.fastq.gz"
+
+
 
 log.info "===================================================================="
 log.info "Whole Exome Sequencing Best Practice Nextflow Pipeline                        "
@@ -113,18 +115,22 @@ workflow {
 
   FASTQC (read_pairs_ch)
 
-  BWA (
+  if (!params.alignment) {exit 1, "Please specify your desirable alignment method by using --alignment argument in the command"}
+  if (params.alignment== 'BWA') {
+    BWA (
         REFERENCE_GENOME.out[0],
         BWA_INDEX.out,
         FASTP.out)
-
-  BOWTIE_INDEX ()
+    SAM_TO_BAM (BWA.out)
+   }
+  if (params.alignment== 'bowtie') {
+    BOWTIE_INDEX ()
  
-  BOWTIE (
+    BOWTIE (
        BOWTIE_INDEX.out,
        FASTP.out)
-
-  SAM_TO_BAM (BWA.out)
+    SAM_TO_BAM (BOWTIE.out)
+   }
 
   SORTING_BAM_FILE (SAM_TO_BAM.out)
 
