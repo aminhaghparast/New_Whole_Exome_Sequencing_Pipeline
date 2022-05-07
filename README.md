@@ -95,7 +95,7 @@ Example:
 
 Example:
 
-    $ nextflow  run main.nf   --reads "/home/amin/fastq/*{1,2}*.fastq.gz"   --alignment BWA_MEM   --trimming fastp
+    $ nextflow  run main.nf   --reads "/home/user/fastq/*{1,2}*.fastq.gz"   --alignment BWA_MEM   --trimming fastp
 
 
 #### `--bedfile` 
@@ -105,18 +105,18 @@ Example:
 
 Example:
 
-    $ nextflow  run  main.nf   --reads "/home/amin/fastq/*{1,2}*.fastq.gz"  --bed "/home/amin/bedfiles/*.bed"   --alignment BWA_MEM   --trimming fastp
+    $ nextflow  run  main.nf   --reads "/home/user/fastq/*{1,2}*.fastq.gz"  --bed "/home/user/bedfiles/*.bed"   --alignment BWA_MEM   --trimming fastp
 
 
 #### `--results` 
    
 * Specifies the folder where the results will be stored for the user.  
 * It does not matter if the folder does not exist.
-* By default is set to CalliNGS-NF's folder: `results` 
+* By default is set to the folder named as `results` in the main directory.  
 
 Example: 
 
-    $ nextflow run CRG-CNAG/CalliNGS-NF --results /home/user/my_results
+    $ nextflow  run  main.nf   --reads "/home/user/fastq/*{1,2}*.fastq.gz"  --bed "/home/user/bedfiles/*.bed"   --alignment BWA_MEM   --trimming fastp --results /home/user/my_results
     
 
     
