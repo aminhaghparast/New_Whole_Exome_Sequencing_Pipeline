@@ -95,7 +95,7 @@ Example:
 
 Example:
 
-   $ nextflow run main.nf   --reads "/home/amin/fastq/*{1,2}*.fastq.gz"   --alignment BWA_MEM   --trimming fastp
+    $ nextflow  run main.nf   --reads "/home/amin/fastq/*{1,2}*.fastq.gz"   --alignment BWA_MEM   --trimming fastp
 
 
 #### `--bedfile` 
