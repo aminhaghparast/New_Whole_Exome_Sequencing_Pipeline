@@ -83,14 +83,13 @@ Example:
 #### `--trimming`
 
 * The desire method for trimming reads. the available choices are "fastp" and "trimmomatic" .
-
+     $ nextflow run main.nf -profile docker --alignment BWA_MEM --trimming
 
 #### `--alignment`
 
 * The desire method for alignment. the available choices are "bowtie" and "BWA-MEM" .
-
-
-    
+    $ nextflow run main.nf -profile docker --alignment BWA_MEM --trimming
+  
 
 #### `--variants`
 
@@ -100,7 +99,7 @@ Example:
 
 Example:
 
-    $ nextflow run CRG-CNAG/CalliNGS-NF --variants /home/user/data/variants.vcf
+    $ 
 
 
 #### `--bedfile` 
