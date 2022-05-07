@@ -75,6 +75,7 @@ example: `ENCSR000COQ1_2.fastq.gz`.
 * The desire method for trimming reads. the available choices are "fastp" and "trimmomatic" .
 
 Example:
+
      $ nextflow run main.nf -profile docker --alignment BWA_MEM --trimming fastp
 
 
