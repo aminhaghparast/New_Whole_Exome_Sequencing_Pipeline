@@ -69,37 +69,27 @@ example: `ENCSR000COQ1_2.fastq.gz`.
 
 ## Pipeline parameters
 
-#### `--reads` 
-   
-* Specifies the location of the paired end reads FASTQ file(s). these reads must be in a standard format as "*{1,2}*.fastq.gz"
-* By default it is set to a test data located in : `$baseDir/reads/read_{1,2}.fq.gz`
-
-
-Example: 
-
-    $ nextflow run CRG-CNAG/CalliNGS-NF --reads '/home/dataset/*_{1,2}.fq.gz'
-
 
 #### `--trimming`
 
 * The desire method for trimming reads. the available choices are "fastp" and "trimmomatic" .
-     $ nextflow run main.nf -profile docker --alignment BWA_MEM --trimming
+* Example:
+     $ nextflow run main.nf -profile docker --alignment BWA_MEM --trimming fastp
+
 
 #### `--alignment`
 
 * The desire method for alignment. the available choices are "bowtie" and "BWA-MEM" .
-    $ nextflow run main.nf -profile docker --alignment BWA_MEM --trimming
-  
-
-#### `--variants`
-
-* The location of the known variants VCF file.
-* It should end in `.vcf` or `vcf.gz`.
-* By default it is set to the CalliNGS-NF's location: `$baseDir/data/known_variants.vcf.gz`.
-
+* Example:
+    $ nextflow run main.nf -profile docker --alignment BWA_MEM --trimming fastp
+ 
+ 
+#### `--reads` 
+   
+* Specifies the location of the paired end reads FASTQ file(s). these reads must be in a standard format as "*{1,2}*.fastq.gz"
+* By default it is set to a test data located in : `$baseDir/reads/read_{1,2}.fq.gz
 Example:
-
-    $ 
+   $ nextflow run main.nf --reads "/home/amin/fastq/*{1,2}*.fastq.gz" --alignment BWA_MEM --trimming fastp
 
 
 #### `--bedfile` 
@@ -109,7 +99,7 @@ Example:
 
 Example:
 
-    $ nextflow run CRG-CNAG/CalliNGS-NF --denylist /home/user/data/denylisted_regions.bed
+    $ nextflow run main.nf --reads "/home/amin/fastq/*{1,2}*.fastq.gz" --bed         --alignment BWA_MEM --trimming fastp
 
 
 #### `--results` 
