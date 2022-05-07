@@ -73,14 +73,17 @@ example: `ENCSR000COQ1_2.fastq.gz`.
 #### `--trimming`
 
 * The desire method for trimming reads. the available choices are "fastp" and "trimmomatic" .
-* Example:
+
+Example:
      $ nextflow run main.nf -profile docker --alignment BWA_MEM --trimming fastp
 
 
 #### `--alignment`
 
 * The desire method for alignment. the available choices are "bowtie" and "BWA-MEM" .
-* Example:
+
+Example:
+
     $ nextflow run main.nf -profile docker --alignment BWA_MEM --trimming fastp
  
  
@@ -88,8 +91,10 @@ example: `ENCSR000COQ1_2.fastq.gz`.
    
 * Specifies the location of the paired end reads FASTQ file(s). these reads must be in a standard format as "*{1,2}*.fastq.gz"
 * By default it is set to a test data located in : `$baseDir/reads/read_{1,2}.fq.gz
+
 Example:
-   $ nextflow run main.nf --reads "/home/amin/fastq/*{1,2}*.fastq.gz" --alignment BWA_MEM --trimming fastp
+
+   $ nextflow run main.nf   --reads "/home/amin/fastq/*{1,2}*.fastq.gz"   --alignment BWA_MEM   --trimming fastp
 
 
 #### `--bedfile` 
@@ -99,7 +104,7 @@ Example:
 
 Example:
 
-    $ nextflow run main.nf --reads "/home/amin/fastq/*{1,2}*.fastq.gz" --bed         --alignment BWA_MEM --trimming fastp
+    $ nextflow  run  main.nf   --reads "/home/amin/fastq/*{1,2}*.fastq.gz"  --bed "/home/amin/bedfiles/*.bed"   --alignment BWA_MEM   --trimming fastp
 
 
 #### `--results` 
