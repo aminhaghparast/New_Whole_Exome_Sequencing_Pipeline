@@ -10,11 +10,14 @@ nextflow.enable.dsl = 2
  * Define the default parameters
  */ 
 params.outputname ="output"
-params.outdir = "./Results"
+params.outdir = "$baseDir/Results"
 params.adapter = "$baseDir/data/adapter.fa"
 params.interval = "$baseDir/data/bed_files/S31285117_Padded.bed"
+params.bed = "$baseDir/data/bed_files/bed_file.bed"
 params.humandb = "/opt/annovar/humandb"
 params.reads = "$baseDir/reads/*{1,2}*.fastq.gz"
+params.maindir = "$baseDir"
+params.bam_folder = "./bam_folder"
 
 
 
@@ -135,7 +138,7 @@ workflow {
    }
    if (params.trimming== 'trimmomatic') {
           if (!params.alignment) {exit 1, "Please specify your desirable alignment method by using --alignment argument in the command"}
-          if (params.alignment== 'BWA') {
+          if (params.alignment== 'BWA_MEM') {
                         TRIMMOMATIC (read_pairs_ch)
                         BWA_INDEX()
                         BWA (
@@ -184,6 +187,7 @@ workflow {
         REFERENCE_GENOME.out[0],
         REFERENCE_GENOME.out[1],
         REFERENCE_GENOME.out[2])
+
 
    VARIANTRECALIBRATOR_SNPS (
         VARIANT_CALLING.out,
@@ -246,4 +250,11 @@ workflow {
         VARIANT_CALLING.out )
         
   VCF2TSV (ANNOTATION.out[0])
+
+
+
+     DEEP_VARIANT (
+        MARKDUPLICATE.out,
+        ADD_OR_REPLACE_READGROUPS.out)
   */
+
