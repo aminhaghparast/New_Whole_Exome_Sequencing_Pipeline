@@ -10,14 +10,13 @@ nextflow.enable.dsl = 2
  * Define the default parameters
  */ 
 params.outputname ="output"
-params.outdir = "$baseDir/Results"
+params.outdir = "./Results"
 params.adapter = "$baseDir/data/adapter.fa"
 params.interval = "$baseDir/data/bed_files/S31285117_Padded.bed"
 params.bed = "$baseDir/data/bed_files/bed_file.bed"
 params.humandb = "/opt/annovar/humandb"
 params.reads = "$baseDir/reads/*{1,2}*.fastq.gz"
 params.maindir = "$baseDir"
-params.bam_folder = "./bam_folder"
 
 
 
