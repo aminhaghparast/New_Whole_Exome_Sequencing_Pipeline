@@ -239,22 +239,19 @@ workflow {
         HARD_FILTERING_STEP_4.out,
         VARIANT_CALLING.out ) 
 
- 
+   ANNOTATION (
+        HARD_FILTERING_STEP_5.out,
+        VARIANT_CALLING.out )
+        
+   VCF2TSV (ANNOTATION.out[0])
 
 
 }
 
-/*
-  ANNOTATION (
-        HARD_FILTERING_STEP_5.out,
-        VARIANT_CALLING.out )
-        
-  VCF2TSV (ANNOTATION.out[0])
 
 
 
-     DEEP_VARIANT (
-        MARKDUPLICATE.out,
-        ADD_OR_REPLACE_READGROUPS.out)
+
+
   */
 
