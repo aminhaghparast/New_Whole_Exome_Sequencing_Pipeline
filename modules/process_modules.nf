@@ -353,23 +353,23 @@ process VARIANTRECALIBRATOR_SNPS {
     label 'gatk'
 	
 	input:
-        file ( haplotypecaller_vcf )
+            file ( haplotypecaller_vcf )
 	    file ( fasta )
-        file ( hapmap )
+            file ( hapmap )
 	    file ( omni )
-        file ( phase1_snps )
+            file ( phase1_snps )
 	    file ( dbsnp )
 	    file reference_fai
 	    file reference_dict
 	    file hapmap_index
 	    file omni_index
 	    file phase1_snps_index
-        file dbsnp_index
+            file dbsnp_index
 
 	output:
 	    file "recalibrate_SNP.recal"
 	    file "recalibrate_SNP.tranches"
-        file "recalibrate_SNP.recal.idx"
+            file "recalibrate_SNP.recal.idx"
 
 	script:
 	"""
@@ -378,20 +378,20 @@ process VARIANTRECALIBRATOR_SNPS {
  	    -R $fasta \
 	    -resource:hapmap,known=false,training=true,truth=true,prior=15.0 $hapmap \
 	    -resource:omni,known=false,training=true,truth=true,prior=12.0 $omni \
-        -resource:1000G,known=false,training=true,truth=false,prior=10.0 $phase1_snps \
-        -resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $dbsnp \
+            -resource:1000G,known=false,training=true,truth=false,prior=10.0 $phase1_snps \
+            -resource:dbsnp,known=true,training=false,truth=false,prior=2.0 $dbsnp \
 	    -an DP \
-        -an QD \
+            -an QD \
 	    -an FS \
-        -an SOR \
-        -an MQ \
-        -an MQRankSum \
-        -an ReadPosRankSum \
-        -mode SNP \
-        -tranche 100.0 -tranche 99.9 -tranche 99.0 -tranche 90.0 \
+            -an SOR \
+            -an MQ \
+            -an MQRankSum \
+            -an ReadPosRankSum \
+            -mode SNP \
+            -tranche 100.0 -tranche 99.9 -tranche 99.0 -tranche 90.0 \
 	    --max-gaussians 8 \
-        -O recalibrate_SNP.recal \
-        --tranches-file recalibrate_SNP.tranches \
+            -O recalibrate_SNP.recal \
+            --tranches-file recalibrate_SNP.tranches \
 
 	"""
 }
