@@ -265,9 +265,9 @@ process BASE_RECALIBRATOR {
     label 'gatk'
 
     input:
-		file ( fasta )
+	file ( fasta )
         file ( sorted_markduplicated_and_readgroups_bam_file )  
-		file ( dbsnp )
+	file ( dbsnp )
         file ( phase1_snp )
         file ( dbsnp_index)
         file ( phase1_snp_index )
